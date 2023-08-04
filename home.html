@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flight Booking</title>
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
+  </head>
+  <body>
+    <div id="header">
+      <h1>Flight Booking</h1>
+      <div id="cart">
+        <a href="cart.html">
+          <img src="https://i.imgur.com/k0tsmU4.png" alt="My Cart"> My Cart </a>
+      </div>
+      <div id="cartPopup" class="popup">
+        <h2>Shopping Cart</h2>
+        <div id="dynamicCartContent"></div>
+		<div id="cartPrice"></div>
+        <button id="closeCart">Close</button>
+      </div>
+	  <p id="currentDateTime"></p>
+    </div>
+    <div id="navbar">
+      <ul>
+        <li>
+          <a href="#"><strong>Home</strong></a>
+        </li>
+        <li>
+          <a href="flights.html">Flights</a>
+        </li>
+        <li>
+          <a href="hotels.html">Hotels</a>
+        </li>
+        <li>
+          <a href="rentalcarsbook.html">Book Rental Cars</a>
+        </li>
+        <li>
+          <a href="orderstatus.html">Order Status</a>
+        </li>
+        <li>
+          <a href="contact.html">Contact</a>
+        </li>
+        <li>
+          <a href="specialoffer.html">Special Offer</a>
+        </li>
+      </ul>
+    </div>
+    <div id="content">
+      <div id="sidebar">
+        <h3>Terms and Conditions</h3>
+        <ol>
+          <li>
+            <strong>All bookings are non-refundable.</strong>
+          </li>
+          <li>Passengers should arrive at the airport <em>at least 2 hours before departure</em>. </li>
+          <li>Baggage allowance is limited to <strong>20kg</strong>. </li>
+        </ol>
+      </div>
+      <div id="main-content">
+        <div id="flight-info">
+          <h3>Flight Information</h3>
+          <table>
+            <tr>
+              <th>Flight Number</th>
+              <th>Departure</th>
+              <th>Destination</th>
+              <th>Departure Time</th>
+            </tr>
+            <tr>
+              <td>ABC123</td>
+              <td>New York</td>
+              <td>Paris</td>
+              <td>08:00 AM</td>
+            </tr>
+            <tr>
+              <td>DEF456</td>
+              <td>Paris</td>
+              <td>Tokyo</td>
+              <td>12:00 PM</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="footer">
+      <h3>Contact Information</h3>
+      <dl>
+        <dt>Email</dt>
+        <dd>ajs180009@utdallas.edu</dd>
+        <dt>Phone</dt>
+        <dd>972-883-2460</dd>
+      </dl>
+      <h3>Submission Requirement</h3>
+      <dl>
+        <dt>Arham J. Siddiqui</dt>
+        <dd>Net ID: AJS180009</dd>
+      </dl>
+	  <h3>Preferences</h3>
+      <div>
+        <label for="backgroundColor">Background Color:</label>
+        <select id="backgroundColor" onchange="setBackgroundColor(this.value)">
+          <option value="#ffffff" selected>White</option>
+          <option value="#f9f9f9">Light Gray</option>
+          <option value="#ebebeb">Gray</option>
+        </select>
+      </div>
+    </div>
+  </body>
+  <script src="myscript.js"></script>
+</html>

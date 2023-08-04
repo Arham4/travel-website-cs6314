@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flight Booking</title>
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
+  </head>
+  <body>
+    <div id="header">
+      <h1>Flight Booking</h1>
+      <div id="cart">
+        <a href="cart.html">
+          <img src="https://i.imgur.com/k0tsmU4.png" alt="My Cart"> My Cart </a>
+      </div>
+      <div id="cartPopup" class="popup">
+        <h2>Shopping Cart</h2>
+        <div id="dynamicCartContent"></div>
+		<div id="cartPrice"></div>
+        <button id="closeCart">Close</button>
+      </div>
+      <p id="currentDateTime"></p>
+    </div>
+    <div id="navbar">
+      <ul>
+        <li>
+          <a href="home.html">Home</a>
+        </li>
+        <li>
+          <a href="flights.html">Flights</a>
+        </li>
+        <li>
+          <a href="hotels.html">Hotels</a>
+        </li>
+        <li>
+          <a href="rentalcarsbook.html">Book Rental Cars</a>
+        </li>
+        <li>
+          <a href="orderstatus.html">Order Status</a>
+        </li>
+        <li>
+          <a href="contact.html">Contact</a>
+        </li>
+        <li>
+		  <a href="#">
+            <strong>Special Offer</strong>
+		  </a>
+        </li>
+      </ul>
+    </div>
+    <div id="content">
+      <div id="sidebar">
+        <h3>Terms and Conditions</h3>
+        <ol>
+          <li>
+            <strong>All bookings are non-refundable.</strong>
+          </li>
+          <li>Passengers should arrive at the airport <em>at least 2 hours before departure</em>. </li>
+          <li>Baggage allowance is limited to <strong>20kg</strong>. </li>
+        </ol>
+      </div>
+      <div id="main-content">
+        <h2>Special Offers</h2>
+        <div id="offerContainer">
+          <div id="questionContainer">
+            <p id="questionText"></p>
+            <button id="yesButton">Yes</button>
+            <button id="noButton">No</button>
+            <button id="skipButton">Skip</button>
+          </div>
+          <div id="offerDetailsContainer" style="display: none;">
+            <p id="offerDetailsText"></p>
+            <p id="timeSpentText"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer">
+      <h3>Contact Information</h3>
+      <dl>
+        <dt>Email</dt>
+        <dd>ajs180009@utdallas.edu</dd>
+        <dt>Phone</dt>
+        <dd>972-883-2460</dd>
+      </dl>
+      <h3>Submission Requirement</h3>
+      <dl>
+        <dt>Arham J. Siddiqui</dt>
+        <dd>Net ID: AJS180009</dd>
+      </dl>
+      <h3>Preferences</h3>
+      <div>
+        <label for="fontSize">Font Size:</label>
+        <select id="fontSize" onchange="setFontSize(this.value)">
+          <option value="14px">Small</option>
+          <option value="16px" selected>Medium</option>
+          <option value="18px">Large</option>
+        </select>
+      </div>
+      <div>
+        <label for="backgroundColor">Background Color:</label>
+        <select id="backgroundColor" onchange="setBackgroundColor(this.value)">
+          <option value="#ffffff" selected>White</option>
+          <option value="#f9f9f9">Light Gray</option>
+          <option value="#ebebeb">Gray</option>
+        </select>
+      </div>
+    </div>
+  </body>
+  <script src="myscript.js"></script>
+</html>
