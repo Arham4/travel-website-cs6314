@@ -447,6 +447,24 @@ if (path === 'specialoffer.html') {
 		return flights;
 	}
 
+	function addFlightsToDatabase(flights) {
+		const jsonData = JSON.stringify(flights);
+
+		$.ajax({
+			url: 'http://localhost:3000/flights.php',
+			type: 'POST',
+			data: {
+				flightData: jsonData
+			},
+			success: function(response) {
+				console.log('Flights added to the database successfully!');
+			},
+			error: function(xhr, status, error) {
+				console.error('Error adding flights to the database:', error);
+			}
+		});
+	}
+
 	$(document).ready(function() {
 		var regularFlights = createDummyFlights();
 		var xmlFlights = parseXMLToFlights(createDummyFlightsXML());
@@ -510,6 +528,8 @@ if (path === 'specialoffer.html') {
 		}
 
 		function handleSubmit() {
+			addFlightsToDatabase(xmlFlights);
+
 			var tripType = $("select[name='trip_type']").val();
 
 			var filteredDepartureFlights = filterFlights(regularFlights, true);
@@ -1107,9 +1127,16 @@ if (path === 'specialoffer.html') {
 				var gender = document.forms["contactForm"]["gender"].value;
 				var email = document.forms["contactForm"]["email"].value;
 				var comment = document.forms["contactForm"]["message"].value;
-				
-				var json = {firstName, lastName, phoneNumber, gender, email, comment};
-				
+
+				var json = {
+					firstName,
+					lastName,
+					phoneNumber,
+					gender,
+					email,
+					comment
+				};
+
 				$("#json-output").html("<p>" + JSON.stringify(json, null, 2) + "</p>")
 			}
 		});
@@ -1157,7 +1184,7 @@ $(document).ready(function() {
 		if (departureFlightDepartureCity !== null) {
 			var departureFlightDestinationCity = getCookie('Flight-Departure Destination City');
 			var departureFlightPrice = getCookie('Flight-Departure Price');
-			
+
 			totalPrice += parseInt(departureFlightPrice.replace("$", ""));
 
 			cartContents += "<p>" + departureFlightDepartureCity + " -> " + departureFlightDestinationCity + " - " + departureFlightPrice;
@@ -1168,7 +1195,7 @@ $(document).ready(function() {
 		if (arrivalFlightDepartureCity !== null) {
 			var arrivalFlightDestinationCity = getCookie('Flight-Arrival Destination City');
 			var arrivalFlightPrice = getCookie('Flight-Arrival Price');
-			
+
 			totalPrice += parseInt(arrivalFlightPrice.replace("$", ""));
 
 			cartContents += "<p>" + arrivalFlightDepartureCity + " -> " + arrivalFlightDestinationCity + " - " + arrivalFlightPrice;
@@ -1179,7 +1206,7 @@ $(document).ready(function() {
 		if (hotelName !== null) {
 			var hotelCity = getCookie('Hotel City');
 			var hotelPrice = getCookie('Hotel Price');
-			
+
 			totalPrice += parseInt(hotelPrice.replace("$", ""));
 
 			cartContents += "<p>" + hotelName + " @ " + hotelCity + " - " + hotelPrice;
@@ -1190,7 +1217,7 @@ $(document).ready(function() {
 		if (carName !== null) {
 			var carCity = getCookie('Car City');
 			var carPrice = getCookie('Car Price');
-			
+
 			totalPrice += parseInt(carPrice.replace("$", ""));
 
 			cartContents += "<p>" + carName + " @ " + carCity + " - " + carPrice;
