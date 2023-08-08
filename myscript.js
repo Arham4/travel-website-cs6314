@@ -1212,6 +1212,7 @@ if (path === 'specialoffer.html') {
 					url: "http://localhost:3000/register.php",
 					data: formData,
 					success: function(response) {
+						setCookie('passengerId', $("input[name='passengerid']").val());
 						alert("Registration successful!");
 					},
 					error: function(xhr, status, error) {

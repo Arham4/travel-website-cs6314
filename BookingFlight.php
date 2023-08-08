@@ -1,77 +1,125 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+ini_set("display_errors", 1);
+ini_set("display_startup_errors", 1);
+error_reporting(E_ALL);
+
+$config = parse_ini_file("config.ini");
+
+$servername = $config["servername"];
+$username = $config["username"];
+$password = $config["password"];
+$dbname = $config["dbname"];
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$flightDetails = [];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type");
+    $action = $_POST["action"];
 
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 1);
-    error_reporting(E_ALL);
+    if ($action === "find_flights") {
+        $departureCity = $_POST["departure_city"];
+        $destinationCity = $_POST["destination_city"];
+        $departureDate = $_POST["departure_date"];
+        $tripType = $_POST["trip_type"];
+        $returnDate = $_POST["return_date"];
 
-    $config = parse_ini_file('config.ini');
-
-    $servername = $config['servername'];
-    $username = $config['username'];
-    $password = $config['password'];
-    $dbname = $config['dbname'];
-
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $departureCity = $_POST['departure_city'];
-    $destinationCity = $_POST['destination_city'];
-    $departureDate = $_POST['departure_date'];
-    $tripType = $_POST['trip_type'];
-    $returnDate = $_POST['return_date'];
-
-    $sql = "SELECT * FROM flights
-            WHERE (origin = '$departureCity' AND destination = '$destinationCity' AND departureDate = '$departureDate')";
-
-    $result = $conn->query($sql);
-
-    $departure_flights = array();
-    $arrival_flights = array();
-    $suggested_flights = array();
-
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $departure_flights[] = $row;
-        }
-    }
-    
-    if ($tripType === 'round_trip') {
         $sql = "SELECT * FROM flights
-                WHERE (destination = '$departureCity' AND origin = '$destinationCity' AND departureDate = '$returnDate')";
+              WHERE (origin = '$departureCity' AND destination = '$destinationCity' AND departureDate = '$departureDate')";
 
         $result = $conn->query($sql);
 
+        $departure_flights = [];
+        $arrival_flights = [];
+        $suggested_flights = [];
+
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                $arrival_flights[] = $row;
+                $departure_flights[] = $row;
             }
         }
-    }
 
-    if (empty($departure_flights) && empty($arrival_flights)) {
-        $sql = "SELECT * FROM flights
-                WHERE (origin = '$departureCity' AND destination = '$destinationCity')
-                OR (destination = '$departureCity' AND origin = '$destinationCity')";
+        if ($tripType === "round_trip") {
+            $sql = "SELECT * FROM flights
+                  WHERE (destination = '$departureCity' AND origin = '$destinationCity' AND departureDate = '$returnDate')";
 
+            $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $arrival_flights[] = $row;
+                }
+            }
+        }
+
+        if (empty($departure_flights) && empty($arrival_flights)) {
+            $sql = "SELECT * FROM flights
+                  WHERE (origin = '$departureCity' AND destination = '$destinationCity')
+                  OR (destination = '$departureCity' AND origin = '$destinationCity')";
+
+            $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $suggested_flights[] = $row;
+                }
+            }
+        }
+    } elseif ($action === "book_flight") {
+        $flightId = $_POST["flightId"];
+        $passengerId = $_COOKIE["passengerId"];
+        $status = $_POST["status"];
+
+        $sql = "INSERT INTO flight_bookings (flightId, passengerId, status) VALUES ('$flightId', '$passengerId', '$status')";
         $result = $conn->query($sql);
 
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $suggested_flights[] = $row;
-            }
+        if ($result === true) {
+            echo "Flight booked successfully!";
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
         }
     }
-
-    $conn->close();
 }
+
+$passengerId = $_COOKIE["passengerId"];
+
+$sql = "SELECT
+            f.origin AS flight_origin,
+            f.destination AS flight_destination,
+            f.price AS flight_price
+          FROM
+            flights AS f
+          WHERE
+            f.id IN (
+              SELECT
+                fb.flightId
+              FROM
+                flight_bookings AS fb
+              WHERE
+                fb.passengerId = '$passengerId'
+            );";
+
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $flightDetails[] = [
+            "flight_origin" => $row["flight_origin"],
+            "flight_destination" => $row["flight_destination"],
+            "flight_price" => $row["flight_price"],
+        ];
+    }
+}
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -137,17 +185,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </ol>
       </div>
       <div id="main-content">
-        <div id="enter-details">
+      <div id="enter-details">
           <h3>Enter your details</h3>
           <form id="flight-form" method="post" action="">
-            <p>
-              <label>Name:</label>
-              <input type="text" name="name">
-            </p>
-            <p>
-              <label>Email:</label>
-              <input type="text" name="email">
-            </p>
             <p>
               <label>Type of Trip:</label>
               <select name="trip_type" onchange="toggleTripOptions()">
@@ -173,29 +213,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <input type="text" name="return_date">
               </p>
             </div>
-            <p>
-              <label>Class:</label>
-              <input type="radio" name="class" value="economy"> Economy <input type="radio" name="class" value="business"> Business
-            </p>
-            <p>
-              <label>Passengers:</label>
-              <button type="button" onclick="togglePassengerForm()">Select Passengers</button>
-            </p>
-            <div id="passenger-form" style="display: none;">
-              <h4>Select Passenger Details</h4>
-              <p>
-                <label>Adults:</label>
-                <input type="number" name="adults" min="0">
-              </p>
-              <p>
-                <label>Children:</label>
-                <input type="number" name="children" min="0">
-              </p>
-              <p>
-                <label>Infants:</label>
-                <input type="number" name="infants" min="0">
-              </p>
-            </div>
+            <input type="hidden" name="action" value="find_flights">
             <input type="submit" value="Search Flights">
           </form>
         </div>
@@ -205,6 +223,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <table id="flight-departure-table">
                     <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Origin</th>
                         <th>Destination</th>
                         <th>Departure Date</th>
@@ -218,6 +237,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <tbody>
                         <?php foreach ($departure_flights as $flight): ?>
                             <tr>
+                                <td><?= $flight["id"] ?></td>
                                 <td><?= $flight["origin"] ?></td>
                                 <td><?= $flight["destination"] ?></td>
                                 <td><?= $flight["departureDate"] ?></td>
@@ -238,6 +258,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <table id="flight-arrival-table">
                     <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Origin</th>
                         <th>Destination</th>
                         <th>Departure Date</th>
@@ -251,6 +272,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <tbody>
                         <?php foreach ($arrival_flights as $flight): ?>
                             <tr>
+                                <td><?= $flight["id"] ?></td>
                                 <td><?= $flight["origin"] ?></td>
                                 <td><?= $flight["destination"] ?></td>
                                 <td><?= $flight["departureDate"] ?></td>
@@ -272,6 +294,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <table id="flight-suggestion-table">
                     <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Origin</th>
                         <th>Destination</th>
                         <th>Departure Date</th>
@@ -285,6 +308,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <tbody>
                         <?php foreach ($suggested_flights as $flight): ?>
                             <tr>
+                                <td><?= $flight["id"] ?></td>
                                 <td><?= $flight["origin"] ?></td>
                                 <td><?= $flight["destination"] ?></td>
                                 <td><?= $flight["departureDate"] ?></td>
@@ -299,10 +323,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </table>
             </div>
         <?php endif; ?>
-        <div id="flight-cart" style="display: none;">
-          <button id="cart-icon" style="display: flex; align-items: center; justify-content: center;"> Add to Cart <img src="https://i.imgur.com/k0tsmU4.png" alt="Cart Icon">
-          </button>
-        </div>
+        <?php if (!empty($departure_flights) || !empty($suggested_flights) || !empty($suggested_flights)): ?>
+          <div id="flight-cart">
+            <button id="cart-icon" style="display: flex; align-items: center; justify-content: center;"> Add to Cart <img src="https://i.imgur.com/k0tsmU4.png" alt="Cart Icon">
+            </button>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
     <div id="footer">
@@ -341,5 +367,139 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             returnDateContainer.style.display = "none";
         }
     }
+
+    function selectFlight(id, status) {
+      $.ajax({
+        url: 'http://localhost:3000/BookingFlight.php',
+        type: 'POST',
+        data: {
+          flightId: id,
+          status: status,
+          action: 'book_flight',
+        },
+        success: function(response) {
+          alert('Flight booked!');
+        },
+        error: function(xhr, status, error) {
+          alert('Error booking flight.');
+        }
+      });
+		}
+
+    function handleDepartureFlightSelection() {
+			const $flights = $("#flight-departure-table tbody tr");
+			$flights.removeClass("selected-flight");
+
+			$("input[type='radio']:checked").each(function() {
+				const $selectedFlight = $(this).closest("tr");
+				$selectedFlight.addClass("selected-flight");
+			});
+
+			$flights.css("opacity", 1);
+			$flights.filter(".selected-flight").css("opacity", 0.5);
+		}
+
+		function handleArrivalFlightSelection() {
+			const $flights = $("#flight-arrival-table tbody tr");
+			$flights.removeClass("selected-flight");
+
+			$("input[type='radio']:checked").each(function() {
+				const $selectedFlight = $(this).closest("tr");
+				$selectedFlight.addClass("selected-flight");
+			});
+
+			$flights.css("opacity", 1);
+			$flights.filter(".selected-flight").css("opacity", 0.5);
+		}
+
+    $(document).ready(function() {
+      $(document).on("change", "#flight-departure-table input[type='radio']", handleDepartureFlightSelection);
+
+      $(document).on("change", "#flight-arrival-table input[type='radio']", handleArrivalFlightSelection);
+
+      $("#cart-icon").click(function(e) {
+        const $selectedDepartureFlight = $("#flight-departure-table tbody tr").filter(".selected-flight");
+        const $selectedArrivalFlight = $("#flight-arrival-table tbody tr").filter(".selected-flight");
+        var tripType = $("select[name='trip_type']").val();
+
+        if ($selectedDepartureFlight.length === 0) {
+          alert("No departure flight was selected!");
+          return;
+        }
+
+        if (tripType === "round_trip" && $selectedArrivalFlight.length === 0) {
+          alert("No departure flight was selected!");
+          return;
+        }
+
+        const $selectedDepartureTds = $selectedDepartureFlight.find("td");
+        const idDeparture = $selectedDepartureTds.eq(0).text();
+
+        selectFlight(idDeparture, "On Time");
+
+        if (tripType === "round_trip") {
+          const $selectedArrivalTds = $selectedArrivalFlight.find("td");
+          const idArrival = $selectedArrivalTds.eq(0).text();
+
+          selectFlight(idArrival, "On Time");
+        }
+      });
+
+      $("#cart a").click(function(e) {
+        e.preventDefault();
+
+        var cartContents = ''
+        var totalPrice = 0
+
+        var flightDetails = <?php echo json_encode($flightDetails); ?>;
+
+        for (var i = 0; i < flightDetails.length; i++) {
+            var flight = flightDetails[i];
+            var flightOrigin = flight.flight_origin;
+            var flightDestination = flight.flight_destination;
+            var flightPrice = flight.flight_price;
+
+            cartContents += "<p>" + flightOrigin + " -> " + flightDestination + " - " + flightPrice;
+            totalPrice += parseInt(flightPrice.replace("$", ""));
+        }
+
+        /*var hotelName = getCookie('Hotel Name');
+
+        if (hotelName !== null) {
+          var hotelCity = getCookie('Hotel City');
+          var hotelPrice = getCookie('Hotel Price');
+
+          totalPrice += parseInt(hotelPrice.replace("$", ""));
+
+          cartContents += "<p>" + hotelName + " @ " + hotelCity + " - " + hotelPrice;
+        }
+
+        var carName = getCookie('Car Name');
+
+        if (carName !== null) {
+          var carCity = getCookie('Car City');
+          var carPrice = getCookie('Car Price');
+
+          totalPrice += parseInt(carPrice.replace("$", ""));
+
+          cartContents += "<p>" + carName + " @ " + carCity + " - " + carPrice;
+        }*/
+
+        if (cartContents === '') {
+          cartContents = "<p>Your cart is empty.</p>";
+          $("#cartPrice").html("");
+        } else {
+          $("#cartPrice").html("<p>Total Price: $" + totalPrice + "</p>");
+        }
+
+        $("#dynamicCartContent").html(cartContents);
+
+        $("#cartPopup").fadeIn();
+      });
+
+      $("#closeCart").click(function() {
+        $("#cartPopup").fadeOut();
+      });
+    });
   </script>
 </html>
