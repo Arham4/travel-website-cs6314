@@ -20,7 +20,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Delete existing hotel entries
 $deleteQuery = "DELETE FROM hotels";
 if ($conn->query($deleteQuery) !== true) {
     $error_message = $conn->error;
@@ -37,7 +36,7 @@ foreach ($hotelData as $hotel) {
     $checkInTime = $hotel['checkinTime'];
     $checkOutDate = $hotel['checkoutDate'];
     $checkOutTime = $hotel['checkoutTime'];
-    $price = intval(str_replace('$', '', $hotel['price'])); // Remove dollar sign and convert to integer
+    $price = intval(str_replace('$', '', $hotel['price']));
 
     $values[] = "('$cityName', '$hotelName', '$checkInDate', '$checkInTime', '$checkOutDate', '$checkOutTime', '$price')";
 }
