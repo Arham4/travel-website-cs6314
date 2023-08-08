@@ -386,21 +386,8 @@ $conn->close();
       });
 		}
 
-    function handleDepartureFlightSelection() {
-			const $flights = $("#flight-departure-table tbody tr");
-			$flights.removeClass("selected-flight");
-
-			$("input[type='radio']:checked").each(function() {
-				const $selectedFlight = $(this).closest("tr");
-				$selectedFlight.addClass("selected-flight");
-			});
-
-			$flights.css("opacity", 1);
-			$flights.filter(".selected-flight").css("opacity", 0.5);
-		}
-
-		function handleArrivalFlightSelection() {
-			const $flights = $("#flight-arrival-table tbody tr");
+		function handleFlightSelection(table) {
+			const $flights = $("#" + table + " tbody tr");
 			$flights.removeClass("selected-flight");
 
 			$("input[type='radio']:checked").each(function() {
@@ -413,9 +400,13 @@ $conn->close();
 		}
 
     $(document).ready(function() {
-      $(document).on("change", "#flight-departure-table input[type='radio']", handleDepartureFlightSelection);
+      $(document).on("change", "#flight-departure-table input[type='radio']", function() {
+        handleFlightSelection("flight-departure-table");
+      });
 
-      $(document).on("change", "#flight-arrival-table input[type='radio']", handleArrivalFlightSelection);
+      $(document).on("change", "#flight-arrival-table input[type='radio']", function() {
+        handleFlightSelection("flight-arrival-table");
+      });
 
       $("#cart-icon").click(function(e) {
         const $selectedDepartureFlight = $("#flight-departure-table tbody tr").filter(".selected-flight");
