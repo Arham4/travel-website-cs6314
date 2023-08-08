@@ -26,3 +26,12 @@ CREATE TABLE flight_bookings (
                                  FOREIGN KEY (flightId) REFERENCES flights(id),
                                  FOREIGN KEY (passengerId) REFERENCES users(id)
 );
+
+CREATE TABLE hotel_bookings (
+                                 id INT AUTO_INCREMENT PRIMARY KEY,
+                                 hotelId INT NOT NULL,
+                                 passengerId VARCHAR(20) NOT NULL,
+                                 status VARCHAR(255) NOT NULL,
+                                 FOREIGN KEY (hotelId) REFERENCES hotels(id),
+                                 FOREIGN KEY (passengerId) REFERENCES users(id)
+);
