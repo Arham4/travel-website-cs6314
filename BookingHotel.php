@@ -1,0 +1,192 @@
+<?php
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type");
+
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+
+    $config = parse_ini_file('config.ini');
+
+    $servername = $config['servername'];
+    $username = $config['username'];
+    $password = $config['password'];
+    $dbname = $config['dbname'];
+
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    $cityName = $_POST['city'];
+    $checkinDate = $_POST['checkin_date'];
+    $checkoutDate = $_POST['checkout_date'];
+
+    $sql = "SELECT * FROM hotels
+            WHERE cityName = '$cityName' AND checkinDate = '$checkinDate' AND checkoutDate = '$checkoutDate'";
+
+    $result = $conn->query($sql);
+
+    $available_hotels = array();
+    $suggested_hotels = array();
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $available_hotels[] = $row;
+        }
+    }
+
+    $conn->close();
+}
+?>
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hotel Booking</title>
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
+  </head>
+  <body>
+    <div id="header">
+      <h1>Hotel Booking</h1>
+      <div id="cart">
+        <a href="cart.html">
+          <img src="https://i.imgur.com/k0tsmU4.png" alt="My Cart"> My Cart </a>
+      </div>
+      <div id="cartPopup" class="popup">
+        <h2>Shopping Cart</h2>
+        <div id="dynamicCartContent"></div>
+		<div id="cartPrice"></div>
+        <button id="closeCart">Close</button>
+      </div>
+      <p id="currentDateTime"></p>
+    </div>
+    <div id="navbar">
+      <ul>
+        <li>
+          <a href="home.html">Home</a>
+        </li>
+        <li>
+          <a href="flights.html">Flights</a>
+        </li>
+        <li>
+          <a href="#">
+            <strong>Hotels</strong>
+          </a>
+        </li>
+        <li>
+          <a href="rentalcarsbook.html">Book Rental Cars</a>
+        </li>
+        <li>
+          <a href="orderstatus.html">Order Status</a>
+        </li>
+        <li>
+          <a href="contact.html">Contact</a>
+        </li>
+        <li>
+          <a href="specialoffer.html">Special Offer</a>
+        </li>
+      </ul>
+    </div>
+    <div id="content">
+      <div id="sidebar">
+        <h3>Terms and Conditions</h3>
+        <ol>
+          <li><strong>All bookings are non-refundable.</strong></li>
+          <li>Passengers should arrive at the airport <em>at least 2 hours before departure</em>.</li>
+          <li>Baggage allowance is limited to <strong>20kg</strong>.</li>
+        </ol>
+      </div>
+      <div id="main-content">
+        <div id="commodity-search">
+          <h3>Hotel Search</h3>
+          <form id="hotel-form" method="post" action="">
+            <p>
+              <label>City:</label>
+              <input type="text" name="city" required>
+            </p>
+            <p>
+              <label>Check-in Date:</label>
+              <input type="date" name="checkin_date" required>
+            </p>
+            <p>
+              <label>Check-out Date:</label>
+              <input type="date" name="checkout_date" required>
+            </p>
+            <input type="submit" value="Search">
+          </form>
+        </div>
+		<div id="hotel-table-container" style="display: none;">
+		  <h3>Regular Results</h3>
+		  <table id="hotel-table">
+			  <thead>
+				<tr>
+				  <th>City Name</th>
+				  <th>Hotel Name</th>
+				  <th>Check-in Date</th>
+				  <th>Check-in Time</th>
+				  <th>Check-out Date</th>
+				  <th>Check-out Time</th>
+				  <th>Price</th>
+				  <th>Choose Hotel</th>
+				</tr>
+			  </thead>
+			  <tbody></tbody>
+		  </table>
+		</div>
+		<div id="hotel-table-container-xml" style="display: none;">
+		  <h3>XML Results</h3>
+		  <table id="hotel-table-xml">
+			  <thead>
+				<tr>
+				  <th>City Name</th>
+				  <th>Hotel Name</th>
+				  <th>Check-in Date</th>
+				  <th>Check-in Time</th>
+				  <th>Check-out Date</th>
+				  <th>Check-out Time</th>
+				  <th>Price</th>
+				  <th>Choose Hotel</th>
+				</tr>
+			  </thead>
+			  <tbody></tbody>
+		  </table>
+		</div>
+		<div id="hotel-cart" style="display: none;">
+			<button id="cart-icon" style="display: flex; align-items: center; justify-content: center;">
+				Add to Cart
+				<img src="https://i.imgur.com/k0tsmU4.png" alt="Cart Icon">
+			</button>
+		</div>
+      </div>
+    </div>
+    <div id="footer">
+      <h3>Contact Information</h3>
+      <dl>
+        <dt>Email</dt>
+        <dd>ajs180009@utdallas.edu</dd>
+        <dt>Phone</dt>
+        <dd>972-883-2460</dd>
+      </dl>
+      <h3>Submission Requirement</h3>
+      <dl>
+        <dt>Arham J. Siddiqui</dt>
+        <dd>Net ID: AJS180009</dd>
+      </dl>
+	  <h3>Preferences</h3>
+      <div>
+        <label for="backgroundColor">Background Color:</label>
+        <select id="backgroundColor" onchange="setBackgroundColor(this.value)">
+          <option value="#ffffff" selected>White</option>
+          <option value="#f9f9f9">Light Gray</option>
+          <option value="#ebebeb">Gray</option>
+        </select>
+      </div>
+    </div>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+</html>
