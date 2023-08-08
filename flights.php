@@ -20,6 +20,12 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$deleteQuery = "DELETE FROM flights";
+if ($conn->query($deleteQuery) !== true) {
+    $error_message = $conn->error;
+    echo "Error deleting flights: " . $error_message;
+}
+
 $flightData = json_decode($_POST['flightData'], true);
 
 $values = [];
