@@ -415,7 +415,7 @@ $conn->close();
       $("#cart-icon").click(function(e) {
         const $selectedDepartureFlight = $("#flight-departure-table tbody tr").filter(".selected-flight");
         const $selectedArrivalFlight = $("#flight-arrival-table tbody tr").filter(".selected-flight");
-        const $selectedSuggestionFlight = $("#flight-arrival-table tbody tr").filter(".selected-flight");
+        const $selectedSuggestionFlight = $("#flight-suggestion-table tbody tr").filter(".selected-flight");
         var tripType = $("select[name='trip_type']").val();
 
         if ($selectedDepartureFlight.length === 0 && $selectedSuggestionFlight.length === 0) {
