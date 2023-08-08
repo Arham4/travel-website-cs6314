@@ -770,6 +770,24 @@ if (path === 'specialoffer.html') {
 		return hotels;
 	}
 
+	function addHotelsToDatabase(hotels) {
+		const jsonData = JSON.stringify(hotels);
+
+		$.ajax({
+			url: 'http://localhost:3000/hotels.php',
+			type: 'POST',
+			data: {
+				hotelData: jsonData
+			},
+			success: function(response) {
+				console.log('Hotels added to the database successfully!');
+			},
+			error: function(xhr, status, error) {
+				console.error('Error adding hotels to the database:', error);
+			}
+		});
+	}
+
 	$(document).ready(function() {
 		var regularHotels = createDummyHotels();
 		var xmlHotels = parseXMLToHotels(createDummyHotelsXML());
@@ -821,6 +839,9 @@ if (path === 'specialoffer.html') {
 		}
 
 		function handleSubmit() {
+
+			addHotelsToDatabase(xmlHotels);
+
 			var filteredHotels = filterHotels(regularHotels);
 			displayHotels("hotel-table", filteredHotels);
 
