@@ -58,4 +58,11 @@ CREATE TABLE cars (
                         price INT NOT NULL
 );
 
-
+CREATE TABLE car_bookings (
+                                id INT AUTO_INCREMENT PRIMARY KEY,
+                                carId INT NOT NULL,
+                                passengerId VARCHAR(20) NOT NULL,
+                                status VARCHAR(255) NOT NULL,
+                                FOREIGN KEY (carId) REFERENCES cars(id),
+                                FOREIGN KEY (passengerId) REFERENCES users(id)
+);
