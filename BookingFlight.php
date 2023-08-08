@@ -101,6 +101,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           <a href="home.html">Home</a>
         </li>
         <li>
+          <a href="register.html">Register</a>
+        </li>
+        <li>
           <a href="#">
             <strong>Flights</strong>
           </a>

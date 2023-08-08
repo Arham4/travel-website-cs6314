@@ -59,6 +59,43 @@ function validateForm() {
 	return true;
 }
 
+function validateRegistration() {
+  const passengerId = document.forms["registrationForm"]["passengerid"].value;
+  const firstName = document.forms["registrationForm"]["name"].value;
+  const lastName = document.forms["registrationForm"]["lastname"].value;
+  const age = document.forms["registrationForm"]["age"].value;
+  const email = document.forms["registrationForm"]["email"].value;
+  const password = document.forms["registrationForm"]["password"].value;
+  const confirmPassword = document.forms["registrationForm"]["retypepassword"].value;
+
+  if (!/^\(\d{3}\) \d{3}-\d{4}$/.test(passengerId)) {
+    alert("Passenger ID must be in the format (ddd) ddd-dddd");
+    return false;
+  }
+
+  if (!email.includes("@") || !email.includes(".edu")) {
+    alert("Email must contain @ and .edu");
+    return false;
+  }
+
+  if (password.length < 8) {
+    alert("Password must be at least 8 characters long");
+    return false;
+  }
+
+  if (password !== confirmPassword) {
+    alert("Passwords do not match");
+    return false;
+  }
+
+  if (passengerId === "" || firstName === "" || lastName === "" || age === "" || email === "" || password === "") {
+    alert("All fields are required");
+    return false;
+  }
+
+  return true;
+}
+
 function toggleTripOptions() {
 	var tripTypeSelect = document.getElementsByName("trip_type")[0];
 	var returnDateContainer = document.getElementById("return_date_container");
@@ -1159,6 +1196,28 @@ if (path === 'specialoffer.html') {
 				};
 
 				$("#json-output").html("<p>" + JSON.stringify(json, null, 2) + "</p>")
+			}
+		});
+	});
+} else if (path === "register.html") {
+	$(document).ready(function() {
+		$("#registrationForm").submit(function(event) {
+			event.preventDefault();
+
+			if (validateRegistration()) {
+				const formData = $(this).serialize();
+
+				$.ajax({
+					type: "POST",
+					url: "http://localhost:3000/register.php",
+					data: formData,
+					success: function(response) {
+						alert("Registration successful!");
+					},
+					error: function(xhr, status, error) {
+						alert("Registration failed. Please try again.");
+					}
+				});
 			}
 		});
 	});

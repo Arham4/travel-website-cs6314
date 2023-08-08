@@ -17,7 +17,7 @@
 		<div id="cartPrice"></div>
         <button id="closeCart">Close</button>
       </div>
-	  <p id="currentDateTime"></p>
+      <p id="currentDateTime"></p>
     </div>
     <div id="navbar">
       <ul>
@@ -25,7 +25,9 @@
           <a href="home.html">Home</a>
         </li>
         <li>
-          <a href="register.html">Register</a>
+          <a href="#">
+            <strong>Register</strong>
+          </a>
         </li>
         <li>
           <a href="flights.html">Flights</a>
@@ -34,9 +36,7 @@
           <a href="hotels.html">Hotels</a>
         </li>
         <li>
-          <a href="#">
-            <strong>Book Rental Cars</strong>
-          </a>
+          <a href="rentalcarsbook.html">Book Rental Cars</a>
         </li>
         <li>
           <a href="orderstatus.html">Order Status</a>
@@ -61,66 +61,40 @@
         </ol>
       </div>
       <div id="main-content">
-		<div id="commodity-search">
-          <h3>Car Search</h3>
-          <form id="car-form">
+        <div id="registration-form">
+          <h3>Register</h3>
+          <form id="registrationForm">
             <p>
-              <label>City:</label>
-              <input type="text" name="city" required>
+              <label>Passenger ID:</label>
+              <input type="text" name="passengerid">
             </p>
             <p>
-              <label>Check-in Date:</label>
-              <input type="date" name="checkin_date" required>
+              <label>First Name:</label>
+              <input type="text" name="name">
             </p>
             <p>
-              <label>Check-out Date:</label>
-              <input type="date" name="checkout_date" required>
+              <label>Last Name:</label>
+              <input type="text" name="lastname">
             </p>
-            <input type="submit" value="Search">
+            <p>
+              <label>Age:</label>
+              <input type="number" name="age">
+            </p>
+            <p>
+              <label>Email:</label>
+              <input type="text" name="email">
+            </p>
+            <p>
+              <label>Password:</label>
+              <input type="password" name="password">
+            </p>
+            <p>
+              <label>Re-type password:</label>
+              <input type="password" name="retypepassword">
+            </p>
+            <input type="submit" value="Register Account">
           </form>
         </div>
-		<div id="car-table-container" style="display: none;">		  
-		  <h3>Regular Results</h3>
-		  <table id="car-table">
-			  <thead>
-				<tr>
-				  <th>Car Name</th>
-				  <th>Location</th>
-				  <th>Check-in Date</th>
-				  <th>Check-in Time</th>
-				  <th>Check-out Date</th>
-				  <th>Check-out Time</th>
-				  <th>Price</th>
-				  <th>Choose Car</th>
-				</tr>
-			  </thead>
-			  <tbody></tbody>
-		  </table>
-		</div>
-		<div id="car-table-container-xml" style="display: none;">		  
-		  <h3>XML Results</h3>
-		  <table id="car-table-xml">
-			  <thead>
-				<tr>
-				  <th>Car Name</th>
-				  <th>Location</th>
-				  <th>Check-in Date</th>
-				  <th>Check-in Time</th>
-				  <th>Check-out Date</th>
-				  <th>Check-out Time</th>
-				  <th>Price</th>
-				  <th>Choose Car</th>
-				</tr>
-			  </thead>
-			  <tbody></tbody>
-		  </table>
-		</div>
-		<div id="car-cart" style="display: none;">
-			<button id="cart-icon" style="display: flex; align-items: center; justify-content: center;">
-				Add to Cart
-				<img src="https://i.imgur.com/k0tsmU4.png" alt="Cart Icon">
-			</button>
-		</div>
       </div>
     </div>
     <div id="footer">
@@ -136,7 +110,7 @@
         <dt>Arham J. Siddiqui</dt>
         <dd>Net ID: AJS180009</dd>
       </dl>
-	  <h3>Preferences</h3>
+      <h3>Preferences</h3>
       <div>
         <label for="backgroundColor">Background Color:</label>
         <select id="backgroundColor" onchange="setBackgroundColor(this.value)">
