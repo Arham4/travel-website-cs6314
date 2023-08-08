@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $checkoutDate = $_POST['checkout_date'];
 
     $sql = "SELECT * FROM hotels
-            WHERE cityName = '$cityName' AND checkinDate = '$checkinDate' AND checkoutDate = '$checkoutDate'";
+            WHERE cityName = '$cityName' AND checkInDate = '$checkinDate' AND checkOutDate = '$checkoutDate'";
 
     $result = $conn->query($sql);
 
@@ -120,48 +120,81 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <input type="submit" value="Search">
           </form>
         </div>
-		<div id="hotel-table-container" style="display: none;">
-		  <h3>Regular Results</h3>
-		  <table id="hotel-table">
-			  <thead>
-				<tr>
-				  <th>City Name</th>
-				  <th>Hotel Name</th>
-				  <th>Check-in Date</th>
-				  <th>Check-in Time</th>
-				  <th>Check-out Date</th>
-				  <th>Check-out Time</th>
-				  <th>Price</th>
-				  <th>Choose Hotel</th>
-				</tr>
-			  </thead>
-			  <tbody></tbody>
-		  </table>
-		</div>
-		<div id="hotel-table-container-xml" style="display: none;">
-		  <h3>XML Results</h3>
-		  <table id="hotel-table-xml">
-			  <thead>
-				<tr>
-				  <th>City Name</th>
-				  <th>Hotel Name</th>
-				  <th>Check-in Date</th>
-				  <th>Check-in Time</th>
-				  <th>Check-out Date</th>
-				  <th>Check-out Time</th>
-				  <th>Price</th>
-				  <th>Choose Hotel</th>
-				</tr>
-			  </thead>
-			  <tbody></tbody>
-		  </table>
-		</div>
-		<div id="hotel-cart" style="display: none;">
-			<button id="cart-icon" style="display: flex; align-items: center; justify-content: center;">
-				Add to Cart
-				<img src="https://i.imgur.com/k0tsmU4.png" alt="Cart Icon">
-			</button>
-		</div>
+        <?php if (!empty($available_hotels)): ?>
+          <div id="hotel-table-container">
+            <h3>Regular Results</h3>
+            <table id="hotel-table">
+              <thead>
+              <tr>
+                <th>City Name</th>
+                <th>Hotel Name</th>
+                <th>Check-in Date</th>
+                <th>Check-in Time</th>
+                <th>Check-out Date</th>
+                <th>Check-out Time</th>
+                <th>Price</th>
+                <th>Choose Hotel</th>
+              </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($available_hotels as $hotel): ?>
+                    <tr>
+                      <td><?= $hotel["cityName"] ?></td>
+                      <td><?= $hotel["hotelName"] ?></td>
+                      <td><?= $hotel["checkInDate"] ?></td>
+                      <td><?= $hotel["checkInTime"] ?></td>
+                      <td><?= $hotel["checkOutDate"] ?></td>
+                      <td><?= $hotel["checkOutTime"] ?></td>
+                      <td><?= $hotel["price"] ?></td>
+                      <td><input type="radio" name="hotel_radio"></td>
+                    </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        <?php endif; ?>
+        <?php if (!empty($suggested_hotels)): ?>
+          <div id="hotel-suggestion-table-container">
+            <h3>We were unable to find a hotel for those dates</h3>
+            <p>Consider these hotels instead.</p>
+            <table id="hotel-suggestion-table">
+              <thead>
+              <tr>
+                <th>City Name</th>
+                <th>Hotel Name</th>
+                <th>Check-in Date</th>
+                <th>Check-in Time</th>
+                <th>Check-out Date</th>
+                <th>Check-out Time</th>
+                <th>Price</th>
+                <th>Choose Hotel</th>
+              </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($suggestion_hotels as $hotel): ?>
+                    <tr>
+                      <td><?= $hotel["cityName"] ?></td>
+                      <td><?= $hotel["hotelName"] ?></td>
+                      <td><?= $hotel["checkInDate"] ?></td>
+                      <td><?= $hotel["checkInTime"] ?></td>
+                      <td><?= $hotel["checkOutDate"] ?></td>
+                      <td><?= $hotel["checkOutTime"] ?></td>
+                      <td><?= $hotel["price"] ?></td>
+                      <td><input type="radio" name="hotel_radio"></td>
+                    </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        <?php endif; ?>
+        <?php if (!empty($suggested_hotels) || !empty($available_hotels)): ?>
+          <div id="hotel-cart">
+            <button id="cart-icon" style="display: flex; align-items: center; justify-content: center;">
+              Add to Cart
+              <img src="https://i.imgur.com/k0tsmU4.png" alt="Cart Icon">
+            </button>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
     <div id="footer">
