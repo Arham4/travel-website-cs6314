@@ -408,31 +408,43 @@ $conn->close();
         handleFlightSelection("flight-arrival-table");
       });
 
+      $(document).on("change", "#flight-suggestion-table input[type='radio']", function() {
+        handleFlightSelection("flight-suggestion-table");
+      });
+
       $("#cart-icon").click(function(e) {
         const $selectedDepartureFlight = $("#flight-departure-table tbody tr").filter(".selected-flight");
         const $selectedArrivalFlight = $("#flight-arrival-table tbody tr").filter(".selected-flight");
+        const $selectedSuggestionFlight = $("#flight-arrival-table tbody tr").filter(".selected-flight");
         var tripType = $("select[name='trip_type']").val();
 
-        if ($selectedDepartureFlight.length === 0) {
+        if ($selectedDepartureFlight.length === 0 && $selectedSuggestionFlight.length === 0) {
           alert("No departure flight was selected!");
           return;
         }
 
-        if (tripType === "round_trip" && $selectedArrivalFlight.length === 0) {
+        if (tripType === "round_trip" && $selectedArrivalFlight.length === 0 && $selectedSuggestionFlight.length === 0) {
           alert("No departure flight was selected!");
           return;
         }
 
-        const $selectedDepartureTds = $selectedDepartureFlight.find("td");
-        const idDeparture = $selectedDepartureTds.eq(0).text();
+        if ($selectedDepartureFlight.length !== 0) {
+          const $selectedDepartureTds = $selectedDepartureFlight.find("td");
+          const idDeparture = $selectedDepartureTds.eq(0).text();
 
-        selectFlight(idDeparture, "On Time");
+          selectFlight(idDeparture, "On Time");
 
-        if (tripType === "round_trip") {
-          const $selectedArrivalTds = $selectedArrivalFlight.find("td");
-          const idArrival = $selectedArrivalTds.eq(0).text();
+          if (tripType === "round_trip") {
+            const $selectedArrivalTds = $selectedArrivalFlight.find("td");
+            const idArrival = $selectedArrivalTds.eq(0).text();
 
-          selectFlight(idArrival, "On Time");
+            selectFlight(idArrival, "On Time");
+          }
+        } else {
+          const $selectedSuggestedTds = $selectedSuggestionFlight.find("td");
+          const idSuggestion = $selectedSuggestedTds.eq(0).text();
+
+          selectFlight(idSuggestion, "On Time");
         }
       });
 
