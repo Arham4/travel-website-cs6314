@@ -1065,6 +1065,24 @@ if (path === 'specialoffer.html') {
 		return cars;
 	}
 
+	function addCarsToDatabase(cars) {
+		const jsonData = JSON.stringify(cars);
+
+		$.ajax({
+			url: 'http://localhost:3000/rentalcarsbook.php',
+			type: 'POST',
+			data: {
+				carData: jsonData
+			},
+			success: function(response) {
+				console.log('Cars added to the database successfully!');
+			},
+			error: function(xhr, status, error) {
+				console.error('Error adding cars to the database:', error);
+			}
+		});
+	}
+
 	$(document).ready(function() {
 		var regularCars = createDummyCars();
 		var xmlCars = parseXMLToCars(createDummyCarsXML());
@@ -1116,6 +1134,8 @@ if (path === 'specialoffer.html') {
 		}
 
 		function handleSubmit() {
+			addCarsToDatabase(xmlCars);
+
 			var filteredCars = filterCars(regularCars);
 			displayCars("car-table", filteredCars);
 

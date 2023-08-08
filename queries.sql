@@ -35,3 +35,27 @@ CREATE TABLE hotel_bookings (
                                  FOREIGN KEY (hotelId) REFERENCES hotels(id),
                                  FOREIGN KEY (passengerId) REFERENCES users(id)
 );
+
+CREATE TABLE hotels (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        cityName VARCHAR(255) NOT NULL,
+                        hotelName VARCHAR(255) NOT NULL,
+                        checkInDate DATE NOT NULL,
+                        checkInTime TIME NOT NULL,
+                        checkOutDate DATE NOT NULL,
+                        checkOutTime TIME NOT NULL,
+                        price INT NOT NULL
+);
+
+CREATE TABLE cars (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        carName VARCHAR(255) NOT NULL,
+                        cityName VARCHAR(255) NOT NULL,
+                        checkInDate DATE NOT NULL,
+                        checkInTime TIME NOT NULL,
+                        checkOutDate DATE NOT NULL,
+                        checkOutTime TIME NOT NULL,
+                        price INT NOT NULL
+);
+
+
