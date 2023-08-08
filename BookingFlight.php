@@ -20,8 +20,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$flightDetails = [];
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $action = $_POST["action"];
 
@@ -109,6 +107,8 @@ $sql = "SELECT
 
 $result = $conn->query($sql);
 
+$flightDetails = [];
+
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $flightDetails[] = [
@@ -117,6 +117,66 @@ if ($result->num_rows > 0) {
             "flight_price" => $row["flight_price"],
         ];
     }
+}
+
+$sql = "SELECT
+            h.hotelName AS hotel_name,
+            h.cityName AS city_name,
+            h.price AS hotel_price
+          FROM
+            hotels AS h
+          WHERE
+            h.id IN (
+              SELECT
+                hb.hotelId
+              FROM
+                hotel_bookings AS hb
+              WHERE
+                hb.passengerId = '$passengerId'
+            );";
+
+$result = $conn->query($sql);
+
+$hotelDetails = [];
+
+if ($result->num_rows > 0) {
+  while ($row = $result->fetch_assoc()) {
+      $hotelDetails[] = [
+          "hotel_name" => $row["hotel_name"],
+          "city_name" => $row["city_name"],
+          "hotel_price" => $row["hotel_price"],
+      ];
+  }
+}
+
+$sql = "SELECT
+            c.carName AS car_name,
+            c.cityName AS city_name,
+            c.price AS car_price
+          FROM
+            cars AS c
+          WHERE
+            c.id IN (
+              SELECT
+                cb.carId
+              FROM
+                car_bookings AS cb
+              WHERE
+                cb.passengerId = '$passengerId'
+            );";
+
+$result = $conn->query($sql);
+
+$carDetails = [];
+
+if ($result->num_rows > 0) {
+  while ($row = $result->fetch_assoc()) {
+      $carDetails[] = [
+          "car_name" => $row["car_name"],
+          "city_name" => $row["city_name"],
+          "car_price" => $row["car_price"],
+      ];
+  }
 }
 
 $conn->close();
@@ -466,27 +526,29 @@ $conn->close();
             totalPrice += parseInt(flightPrice.replace("$", ""));
         }
 
-        /*var hotelName = getCookie('Hotel Name');
+        var hotelDetails = <?php echo json_encode($hotelDetails); ?>;
 
-        if (hotelName !== null) {
-          var hotelCity = getCookie('Hotel City');
-          var hotelPrice = getCookie('Hotel Price');
+        for (var i = 0; i < hotelDetails.length; i++) {
+            var hotel = hotelDetails[i];
+            var hotelName = hotel.hotel_name;
+            var cityName = hotel.city_name;
+            var hotelPrice = hotel.hotel_price;
 
-          totalPrice += parseInt(hotelPrice.replace("$", ""));
-
-          cartContents += "<p>" + hotelName + " @ " + hotelCity + " - " + hotelPrice;
+            cartContents += "<p>" + hotelName + " @ " + cityName + " - " + hotelPrice;
+            totalPrice += parseInt(hotelPrice.replace("$", ""));
         }
 
-        var carName = getCookie('Car Name');
+        var carDetails = <?php echo json_encode($carDetails); ?>;
 
-        if (carName !== null) {
-          var carCity = getCookie('Car City');
-          var carPrice = getCookie('Car Price');
+        for (var i = 0; i < carDetails.length; i++) {
+            var car = carDetails[i];
+            var carName = car.car_name;
+            var cityName = car.city_name;
+            var carPrice = car.car_price;
 
-          totalPrice += parseInt(carPrice.replace("$", ""));
-
-          cartContents += "<p>" + carName + " @ " + carCity + " - " + carPrice;
-        }*/
+            cartContents += "<p>" + carName + " @ " + cityName + " - " + carPrice;
+            totalPrice += parseInt(carPrice.replace("$", ""));
+        }
 
         if (cartContents === '') {
           cartContents = "<p>Your cart is empty.</p>";

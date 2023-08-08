@@ -21,8 +21,6 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$carDetails = [];
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $action = $_POST["action"];
     
@@ -76,6 +74,66 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 $passengerId = $_COOKIE["passengerId"];
 
 $sql = "SELECT
+            f.origin AS flight_origin,
+            f.destination AS flight_destination,
+            f.price AS flight_price
+          FROM
+            flights AS f
+          WHERE
+            f.id IN (
+              SELECT
+                fb.flightId
+              FROM
+                flight_bookings AS fb
+              WHERE
+                fb.passengerId = '$passengerId'
+            );";
+
+$result = $conn->query($sql);
+
+$flightDetails = [];
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $flightDetails[] = [
+            "flight_origin" => $row["flight_origin"],
+            "flight_destination" => $row["flight_destination"],
+            "flight_price" => $row["flight_price"],
+        ];
+    }
+}
+
+$sql = "SELECT
+            h.hotelName AS hotel_name,
+            h.cityName AS city_name,
+            h.price AS hotel_price
+          FROM
+            hotels AS h
+          WHERE
+            h.id IN (
+              SELECT
+                hb.hotelId
+              FROM
+                hotel_bookings AS hb
+              WHERE
+                hb.passengerId = '$passengerId'
+            );";
+
+$result = $conn->query($sql);
+
+$hotelDetails = [];
+
+if ($result->num_rows > 0) {
+  while ($row = $result->fetch_assoc()) {
+      $hotelDetails[] = [
+          "hotel_name" => $row["hotel_name"],
+          "city_name" => $row["city_name"],
+          "hotel_price" => $row["hotel_price"],
+      ];
+  }
+}
+
+$sql = "SELECT
             c.carName AS car_name,
             c.cityName AS city_name,
             c.price AS car_price
@@ -92,6 +150,8 @@ $sql = "SELECT
             );";
 
 $result = $conn->query($sql);
+
+$carDetails = [];
 
 if ($result->num_rows > 0) {
   while ($row = $result->fetch_assoc()) {
@@ -359,6 +419,30 @@ $conn->close();
         var cartContents = ''
         var totalPrice = 0
 
+        var flightDetails = <?php echo json_encode($flightDetails); ?>;
+
+        for (var i = 0; i < flightDetails.length; i++) {
+            var flight = flightDetails[i];
+            var flightOrigin = flight.flight_origin;
+            var flightDestination = flight.flight_destination;
+            var flightPrice = flight.flight_price;
+
+            cartContents += "<p>" + flightOrigin + " -> " + flightDestination + " - " + flightPrice;
+            totalPrice += parseInt(flightPrice.replace("$", ""));
+        }
+
+        var hotelDetails = <?php echo json_encode($hotelDetails); ?>;
+
+        for (var i = 0; i < hotelDetails.length; i++) {
+            var hotel = hotelDetails[i];
+            var hotelName = hotel.hotel_name;
+            var cityName = hotel.city_name;
+            var hotelPrice = hotel.hotel_price;
+
+            cartContents += "<p>" + hotelName + " @ " + cityName + " - " + hotelPrice;
+            totalPrice += parseInt(hotelPrice.replace("$", ""));
+        }
+
         var carDetails = <?php echo json_encode($carDetails); ?>;
 
         for (var i = 0; i < carDetails.length; i++) {
@@ -370,28 +454,6 @@ $conn->close();
             cartContents += "<p>" + carName + " @ " + cityName + " - " + carPrice;
             totalPrice += parseInt(carPrice.replace("$", ""));
         }
-
-        /*var carName = getCookie('Hotel Name');
-
-        if (carName !== null) {
-          var hotelCity = getCookie('Hotel City');
-          var hotelPrice = getCookie('Hotel Price');
-
-          totalPrice += parseInt(hotelPrice.replace("$", ""));
-
-          cartContents += "<p>" + carName + " @ " + hotelCity + " - " + hotelPrice;
-        }
-
-        var carName = getCookie('Car Name');
-
-        if (carName !== null) {
-          var carCity = getCookie('Car City');
-          var carPrice = getCookie('Car Price');
-
-          totalPrice += parseInt(carPrice.replace("$", ""));
-
-          cartContents += "<p>" + carName + " @ " + carCity + " - " + carPrice;
-        }*/
 
         if (cartContents === '') {
           cartContents = "<p>Your cart is empty.</p>";
