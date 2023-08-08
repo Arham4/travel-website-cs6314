@@ -26,3 +26,4 @@ username = "USERNAME"
 password = "PASSWORD"
 dbname = "DBNAME"
 ```
+7. The database environment needs to be setup with the queries found in [`queries.sql`](./queries.sql).
