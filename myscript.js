@@ -122,93 +122,68 @@ function displayOrderStatus() {
 	var hotelTableBody = document.getElementById('hotelTableBody');
 	var carTableBody = document.getElementById('carTableBody');
 
-	var departureFlightDepartureCity = getCookie('Flight-Departure Departure City');
+	$.ajax({
+		url: 'http://localhost:3000/orderstatus.php',
+		type: 'GET',
+		data: {},
+		success: function(response) {
+			let parsedResponse = JSON.parse(response);
+			let flightDetails = parsedResponse.flightDetails;
+			let hotelDetails = parsedResponse.hotelDetails;
+			let carDetails = parsedResponse.carDetails;
 
-	if (departureFlightDepartureCity === null) {
-		showError('No flight info found!');
-		return;
-	}
+			if (flightDetails.length === 0) {
+				showError('No flight info found!');
+				return;
+			}
 
-	var departureFlightDestinationCity = getCookie('Flight-Departure Destination City');
-	var departureFlightDepartureDate = getCookie('Flight-Departure Departure Date');
-	var departureFlightDepartureTime = getCookie('Flight-Departure Departure Time');
-	var departureFlightArrivalDate = getCookie('Flight-Departure Arrival Date');
-	var departureFlightArrivalTime = getCookie('Flight-Departure Arrival Time');
-	var departureFlightPrice = getCookie('Flight-Departure Price');
+			if (hotelDetails.length === 0) {
+				showError('No hotel info found!');
+				return;
+			}
 
-	var flightRow = flightTableBody.insertRow();
-	flightRow.insertCell().textContent = departureFlightDepartureCity;
-	flightRow.insertCell().textContent = departureFlightDestinationCity;
-	flightRow.insertCell().textContent = departureFlightDepartureDate;
-	flightRow.insertCell().textContent = departureFlightDepartureTime;
-	flightRow.insertCell().textContent = departureFlightArrivalDate;
-	flightRow.insertCell().textContent = departureFlightArrivalTime;
-	flightRow.insertCell().textContent = departureFlightPrice;
+			if (carDetails.length === 0) {
+				showError('No car info found!');
+				return;
+			}
 
-	var arrivalFlightDepartureCity = getCookie('Flight-Arrival Departure City');
+			for (let i = 0; i < flightDetails.length; i++) {
+				let flightRow = flightTableBody.insertRow();
+				flightRow.insertCell().textContent = flightDetails[i].origin;
+				flightRow.insertCell().textContent = flightDetails[i].destination;
+				flightRow.insertCell().textContent = flightDetails[i].departureDate;
+				flightRow.insertCell().textContent = flightDetails[i].departureTime;
+				flightRow.insertCell().textContent = flightDetails[i].arrivalDate;
+				flightRow.insertCell().textContent = flightDetails[i].arrivalTime;
+				flightRow.insertCell().textContent = flightDetails[i].price;
+			}
 
-	if (arrivalFlightDepartureCity !== null) {
-		var arrivalFlightDestinationCity = getCookie('Flight-Arrival Destination City');
-		var arrivalFlightDepartureDate = getCookie('Flight-Arrival Departure Date');
-		var arrivalFlightDepartureTime = getCookie('Flight-Arrival Departure Time');
-		var arrivalFlightArrivalDate = getCookie('Flight-Arrival Arrival Date');
-		var arrivalFlightArrivalTime = getCookie('Flight-Arrival Arrival Time');
-		var arrivalFlightPrice = getCookie('Flight-Arrival Price');
+			for (let i = 0; i < hotelDetails.length; i++) {
+				let hotelRow = hotelTableBody.insertRow();
+				hotelRow.insertCell().textContent = hotelDetails[i].cityName;
+				hotelRow.insertCell().textContent = hotelDetails[i].hotelName;
+				hotelRow.insertCell().textContent = hotelDetails[i].checkInDate;
+				hotelRow.insertCell().textContent = hotelDetails[i].checkInTime;
+				hotelRow.insertCell().textContent = hotelDetails[i].checkOutDate;
+				hotelRow.insertCell().textContent = hotelDetails[i].checkOutTime;
+				hotelRow.insertCell().textContent = hotelDetails[i].price;
+			}
 
-		flightRow.insertCell().textContent = arrivalFlightDepartureCity;
-		flightRow.insertCell().textContent = arrivalFlightDestinationCity;
-		flightRow.insertCell().textContent = arrivalFlightDepartureDate;
-		flightRow.insertCell().textContent = arrivalFlightDepartureTime;
-		flightRow.insertCell().textContent = arrivalFlightArrivalDate;
-		flightRow.insertCell().textContent = arrivalFlightArrivalTime;
-		flightRow.insertCell().textContent = arrivalFlightPrice;
-	}
-
-	var hotelName = getCookie('Hotel Name');
-
-	if (hotelName === null) {
-		showError('No hotel info found!');
-		return;
-	}
-
-	var hotelCity = getCookie('Hotel City');
-	var hotelCheckinDate = getCookie('Hotel Check-in Date');
-	var hotelCheckinTime = getCookie('Hotel Check-in Time');
-	var hotelCheckoutDate = getCookie('Hotel Checkout Date');
-	var hotelCheckoutTime = getCookie('Hotel Checkout Time');
-	var hotelPrice = getCookie('Hotel Price');
-
-	var hotelRow = hotelTableBody.insertRow();
-	hotelRow.insertCell().textContent = hotelCity;
-	hotelRow.insertCell().textContent = hotelName;
-	hotelRow.insertCell().textContent = hotelCheckinDate;
-	hotelRow.insertCell().textContent = hotelCheckinTime;
-	hotelRow.insertCell().textContent = hotelCheckoutDate;
-	hotelRow.insertCell().textContent = hotelCheckoutTime;
-	hotelRow.insertCell().textContent = hotelPrice;
-
-	var carName = getCookie('Car Name');
-
-	if (carName === null) {
-		showError('No car info found!');
-		return;
-	}
-
-	var carCity = getCookie('Car City');
-	var carCheckinDate = getCookie('Car Check-in Date');
-	var carCheckinTime = getCookie('Car Check-in Time');
-	var carCheckoutDate = getCookie('Car Checkout Date');
-	var carCheckoutTime = getCookie('Car Checkout Time');
-	var carPrice = getCookie('Car Price');
-
-	var carRow = carTableBody.insertRow();
-	carRow.insertCell().textContent = carName;
-	carRow.insertCell().textContent = carCity;
-	carRow.insertCell().textContent = carCheckinDate;
-	carRow.insertCell().textContent = carCheckinTime;
-	carRow.insertCell().textContent = carCheckoutDate;
-	carRow.insertCell().textContent = carCheckoutTime;
-	carRow.insertCell().textContent = carPrice;
+			for (let i = 0; i < carDetails.length; i++) {
+				let carRow = carTableBody.insertRow();
+				carRow.insertCell().textContent = carDetails[i].carName;
+				carRow.insertCell().textContent = carDetails[i].cityName;
+				carRow.insertCell().textContent = carDetails[i].checkInDate;
+				carRow.insertCell().textContent = carDetails[i].checkInTime;
+				carRow.insertCell().textContent = carDetails[i].checkOutDate;
+				carRow.insertCell().textContent = carDetails[i].checkOutTime;
+				carRow.insertCell().textContent = carDetails[i].price;
+			}
+		},
+		error: function(xhr, status, error) {
+			console.error('Error checking bookings:', error);
+		}
+	});
 }
 
 function showError(message) {
