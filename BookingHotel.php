@@ -332,7 +332,7 @@ $conn->close();
 
       $("#cart-icon").click(function(e) {
         const $selectedHotel = $("#hotel-table tbody tr").filter(".selected-hotel");
-        const $selectedSuggestionHotel = $("#hotel-suggested-table tbody tr").filter(".selected-hotel");
+        const $selectedSuggestionHotel = $("#hotel-suggestion-table tbody tr").filter(".selected-hotel");
         var tripType = $("select[name='trip_type']").val();
 
         if ($selectedHotel.length === 0 && $selectedSuggestionHotel.length === 0) {
