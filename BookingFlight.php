@@ -157,7 +157,7 @@ $conn->close();
           </a>
         </li>
         <li>
-          <a href="hotels.html">Hotels</a>
+          <a href="BookingHotel.php">Hotels</a>
         </li>
         <li>
           <a href="rentalcarsbook.html">Book Rental Cars</a>

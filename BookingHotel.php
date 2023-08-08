@@ -133,7 +133,7 @@ $conn->close();
           <a href="home.html">Home</a>
         </li>
         <li>
-          <a href="flights.html">Flights</a>
+          <a href="BookingFlight.php">Flights</a>
         </li>
         <li>
           <a href="#">
